@@ -1,2 +1,4 @@
-# flex-slider
-Awesome Responsive Flexbox Slider
+# flex-carousel
+Awesome Responsive Flexbox Carousel
+
+Just copy the HTML, CSS and JavaScript. Have fun! No dependencies needed.
