@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .flex-slider {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: space-evenly;
+        }
+
+        .flex-slider a {
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .flex-slider img {
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        .flex-slider .slider_item {
+            display: none;
+            margin: 1rem;
+            padding: .5rem;
+        }
+
+        .flex-slider .slider_item.display {
+            display: block;
+            animation: einblenden 2s linear;
+        }
+
+        @keyframes einblenden {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Awesome Responsive Flexbox Slider</h1>
+<p>Just copy the following code and have fun.</p>
+
+<aside class="flex-slider" aria-roledescription="carousel" aria-live="off">
+    <a href="#" title="" class="slider_item">
+        <img src="https://via.placeholder.com/150/F0F/000?text=Image" alt="text">
+        <p>Image with text</p>
+    </a>
+    <a href="#" title="" class="slider_item">
+        <img src="https://via.placeholder.com/150/0FF/000?text=Image" alt="text">
+        <p>Image with text 2</p>
+    </a>
+    <a href="#" title="" class="slider_item">
+        <img src="https://via.placeholder.com/150/00F/000?text=Image" alt="text">
+        <p>Image with text 3</p>
+    </a>
+    <a href="#" title="" class="slider_item">
+        <img src="https://via.placeholder.com/150/F00/000?text=Image" alt="text">
+        <p>Image with text 4</p>
+    </a>
+    <p class="slider_item">Only text</p>
+    <img src="https://via.placeholder.com/150/F00/000?text=Only Image" alt="text" class="slider_item">
+</aside>
+
+<script>
+    /**
+     * The flex slider JavaScript.
+     *
+     * @param {string} sliderDOM - the CSS selector to find the element, e.g. aside.flex-slider
+     * @param {number} elementsToShow - the number of elements to be shown, slider is hidden if less existing
+     * @param {number} duration - duration in ms when to slide
+     */
+    function flexSlider(sliderDOM, elementsToShow, duration) {
+        var sliderNode = document.querySelector(sliderDOM);
+        var allElements = sliderNode.querySelectorAll('.slider_item');
+        var size = allElements.length;
+        var current = elementsToShow - 1; // in case of three products being shown, the index of the third is 2
+
+        if (size < elementsToShow) {
+            // hide slider if not enough items are existing
+            sliderNode.style.display = 'none';
+            return;
+        }
+
+        allElements.forEach(init);
+
+        setInterval(shuffle, duration);
+
+        /**
+         * Initializes the slider elements:
+         * - ARIA
+         * - Set display to first #elementsToShow items
+         * - ordering
+         *
+         * given by the forEach:
+         * @param {HTMLElement} elem - the traversed element
+         * @param {number} index - the index of the current element
+         */
+        function init(elem, index) {
+            if (index < elementsToShow) {
+                elem.classList.add('display');
+                elem.dataset.order = index.toString();
+            } else {
+                elem.dataset.order = "-1";
+            }
+            elem.setAttribute("aria-label", index + "of " + size);
+            elem.setAttribute("aria-roledescription", "slide");
+        }
+
+        /**
+         * Shuffles the products around
+         */
+        function shuffle() {
+            // increment counter
+            current++;
+
+            // if shuffled through the available items, start from the beginning
+            if (current === size) {
+                current = 0;
+            }
+
+            // hide the first currently visible item
+            hide(sliderNode.querySelector('.slider_item.display[data-order="0"]'));
+
+            // set the flex order of the remaining visible items
+            sliderNode.querySelectorAll('.slider_item.display').forEach(move);
+
+            // show next item
+            show(allElements[current]);
+        }
+
+        /**
+         * Hides the given element
+         * @param elementToHide
+         */
+        function hide(elementToHide) {
+            elementToHide.classList.remove('display');
+            elementToHide.dataset.order = "-1";
+            elementToHide.style.order = -1;
+        }
+
+        /**
+         * Moves the element to the left
+         *
+         * @param element - given by the forEach
+         */
+        function move(element) {
+            var currentOrder = parseInt(element.dataset.order) - 1;
+            element.dataset.order = currentOrder.toString();
+            element.style.order = currentOrder;
+        }
+
+        /**
+         * Shows the given element
+         *
+         * @param element
+         */
+        function show(element) {
+            element.classList.add('display');
+            // set ordering to positive, so it's on the right of all others
+            element.style.order = elementsToShow - 1;
+            element.dataset.order = (elementsToShow - 1).toString();
+        }
+    }
+
+    var sliderElements = 3;
+    if (window.innerWidth < 800) {
+        sliderElements = 1;
+    }
+
+    flexSlider(".flex-slider", sliderElements, 4000);
+</script>
+</body>
+</html>
